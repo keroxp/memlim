@@ -1,0 +1,34 @@
+{
+  "name": "memlim",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "jest --detectOpenHandles --forceExit"
+  },
+  "author": "Yusuke Sakurai<kerokerokerop@gmail.com",
+  "license": "MIT",
+  "jest": {
+    "moduleFileExtensions": [
+      "ts"
+    ],
+    "transform": {
+      "\\.(tsx?)$": "ts-jest"
+    },
+    "modulePathIgnorePatterns": [
+      "dist"
+    ],
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/**/*.test.(ts)"
+    ],
+    "testEnvironment": "node"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@types/jest": "^23.1.4",
+    "jest": "^23.3.0",
+    "ts-jest": "^23.0.0",
+    "typescript": "^2.9.2"
+  }
+}
