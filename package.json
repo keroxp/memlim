@@ -10,7 +10,8 @@
   "license": "MIT",
   "jest": {
     "moduleFileExtensions": [
-      "ts"
+      "ts",
+      "js"
     ],
     "transform": {
       "\\.(tsx?)$": "ts-jest"

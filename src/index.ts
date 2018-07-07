@@ -2,7 +2,7 @@ type MemlimCacheType = string | ArrayBuffer;
 export class Memlim<T extends MemlimCacheType> {
     data: { [key: string]: { key: string, data: T, size: number, lastAccessedAt: Date, createdAt: Date } } = {}
     freeSize: number;
-    timers = {}
+    timers = {};
     constructor(
         readonly size: number,
         readonly opts: { overwrite: "latestAccess" | "eldestAccess" | "latest" | "eldest" | "minSize" | "maxSize" | "clear" } = {
@@ -13,7 +13,6 @@ export class Memlim<T extends MemlimCacheType> {
     put(key: string, data: T, ttlMsec?: number) {
         let size = 0;
         if (typeof data === "string") {
-            const { length } = data;            
             size = data.length * 2;
         } else if (data instanceof ArrayBuffer) {
             size = data.byteLength;
@@ -30,7 +29,7 @@ export class Memlim<T extends MemlimCacheType> {
             size,
             lastAccessedAt: now,
             createdAt: now
-        }
+        };
         this.freeSize -= size;
         this.clearTimer(key);
         if (ttlMsec > 0) {
@@ -60,11 +59,11 @@ export class Memlim<T extends MemlimCacheType> {
     clear() {
         Object.values(this.timers).forEach(clearTimeout);        
         this.freeSize = this.size;
-        this.timers = {}
+        this.timers = {};
         this.data = {}
     }
     private ensureSize(size) {
-        let list = []
+        let list = [];
         if (this.opts.overwrite === "latestAccess") {
             list = Object.values(this.data).sort((a, b) => a.lastAccessedAt.getTime() - b.lastAccessedAt.getTime());
         } else if (this.opts.overwrite === "eldestAccess") {
@@ -82,7 +81,7 @@ export class Memlim<T extends MemlimCacheType> {
         } else {
             throw new Error("size over.");
         }
-        while (this.size < this.freeSize + size) {
+        while (list.length > 0 && this.size < this.freeSize + size) {
             const { key } = list.pop();
             this.delete(key);
         }

@@ -15,7 +15,6 @@ var Memlim = /** @class */ (function () {
         var _this = this;
         var size = 0;
         if (typeof data === "string") {
-            var length_1 = data.length;
             size = data.length * 2;
         }
         else if (data instanceof ArrayBuffer) {
@@ -95,7 +94,7 @@ var Memlim = /** @class */ (function () {
         else {
             throw new Error("size over.");
         }
-        while (this.size < this.freeSize + size) {
+        while (list.length > 0 && this.size < this.freeSize + size) {
             var key = list.pop().key;
             this.delete(key);
         }
