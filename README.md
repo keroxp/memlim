@@ -5,6 +5,12 @@
 
 memlim is a tiny in-memory cache library that can be used on limited size of memory.  
 
+## Installation
+
+```
+$ npm install memlim
+```
+
 ## Usage
 
 ```js
