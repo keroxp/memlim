@@ -1,6 +1,6 @@
 {
   "name": "memlim",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0-alpha2",
   "description": "Size limited in-memory cache for Node.js, Browser.",
   "main": "dist/index.js",
   "keywords": [
