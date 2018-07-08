@@ -24,7 +24,6 @@ memlim.put("b", "bbb", 1000); // with ttl (msec)
 memlim.put("bindata", new ArrayBuffer(100)); // binary data
 
 memlim.get("a"); // get data;
-memlim.access("a"); // get data and update the last accessed date.
 
 memlim.delete("a"); // delete
 
@@ -35,32 +34,10 @@ memlim.dataCount; // total data count
 memlim.clear(); // clear all data
 ```
 
-## Operations Order
-
-### put(key: string, data: string | ArrayBuffer, ttlMsec:number = 0) 
-
-**Order: O(logN)** 
-- *O(1) when overwrite: "clear" or undefined*  
-
-### get(key: string)
-**Order: O(1)**  
-
-### access(key: string)
-**Order: O(2logN)**
-- *O(1) when overwrite: "clear" or undefined*    
-
-### delete(key: string)
-**Order: O(logN)**
-- *O(1): when overwrite: "clear" or  undefined*  
-
-### clear()
-**Order: O(1)**
-
-
 ## Overwrite Policies
 
 Memlim will try to reuse space for new data when total used size exceeded the limitation.  
-By default, memlim deletes data which was accessed (by `put, access`) on the oldest date.  
+By default, memlim deletes data which was accessed (by `put/get`) at the oldest date.  
 
 This policy can be changed by passing the policy value to constructor.
 
@@ -85,28 +62,19 @@ Try to delete entries that has the minimum size in all data.
 
 Try to delete entries that has the maximum size in all data.
 
-#### "clear"
+#### custom compare function
 
-Clear all entries.
-
-#### undefined
-
-Throw Error.
-
-#### custom hash function
-
-You can pass arbitrary hash function as `overwrite`.  
-When hash function was given, memlim will keep entries sorted on insertion and deletion by this function's hashcode.  
-Memlim will delete entries that have **minimum** hashcode value.
+You can pass arbitrary compare function between entries.  
+When compare function was given, memlim will sort entries by that and delete the last entry recursively until total free size exceeds size to be added.
 
 ```js
 const memlim = new Memlim(12, {
-    overwrite: a => parseInt(a.data)
+    overwrite: (a, b) => a.data.localCompare(b.data)
 });
 memlim.put("a", "11");
 memlim.put("b", "22");
 memlim.put("c", "01");
-// will delete c("01")
+// will delete b("22")
 memlim.put("d", "33");
 
 ```

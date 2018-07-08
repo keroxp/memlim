@@ -1,7 +1,7 @@
 {
   "name": "memlim",
   "version": "1.0.0-alpha2",
-  "description": "Size limited in-memory cache for Node.js, Browser.",
+  "description": "Size limited in-memory cache for Node.js, Browser with no dependencies.",
   "main": "dist/index.js",
   "keywords": [
     "cache",
@@ -32,11 +32,8 @@
     ],
     "testEnvironment": "node"
   },
-  "dependencies": {
-    "bintrees": "^1.0.2"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/bintrees": "^1.0.2",
     "@types/jest": "^23.1.4",
     "@types/sinon": "^5.0.1",
     "jest": "^23.3.0",
