@@ -1,4 +1,5 @@
 # memlim
+![npm](https://img.shields.io/npm/v/memlim.svg?style=flat-square)
 ![CircleCI](https://img.shields.io/circleci/project/github/keroxp/memlim.svg?style=flat-square)
 ![Codecov](https://img.shields.io/codecov/c/github/keroxp/memlim.svg?style=flat-square)
 
