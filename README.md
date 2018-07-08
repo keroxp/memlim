@@ -40,18 +40,18 @@ memlim.clear(); // clear all data
 ### put(key: string, data: string | ArrayBuffer, ttlMsec:number = 0) 
 
 **Order: O(logN)** 
-- *O(1) when overwrite: undefined*  
+- *O(1) when overwrite: "clear" or undefined*  
 
 ### get(key: string)
 **Order: O(1)**  
 
 ### access(key: string)
 **Order: O(2logN)**
-- *O(1) when overwrite: undefined*    
+- *O(1) when overwrite: "clear" or undefined*    
 
 ### delete(key: string)
 **Order: O(logN)**
-- *O(1): when overwrite: undefined*  
+- *O(1): when overwrite: "clear" or  undefined*  
 
 ### clear()
 **Order: O(1)**
