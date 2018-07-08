@@ -58,7 +58,15 @@ describe("memlim", () => {
             expect(memlim.dataCount).toBe(2);
             expect(memlim.freeSize).toBe(0);
             expect(memlim.get("a")).toBeUndefined();
-            expect(memlim.get("c")).toBeUndefined();
+            expect(memlim.get("b")).toBeUndefined();
+        });
+        test("put should clear data if overwrite is 'clear' and size to be added is bigger than freeSize", () => {
+           const memlim = new Memlim(10, {overwrite: "clear"});
+           memlim.put("a", "aaaaa");
+           memlim.put("b", "b");
+           expect(memlim.freeSize).toBe(8);
+           expect(memlim.dataCount).toBe(1);
+           expect(memlim.get("b")).toBe("b");
         });
     });
     describe("array buffer", () => {

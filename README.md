@@ -62,6 +62,8 @@ Try to delete entries that has the minimum size in all data.
 
 Try to delete entries that has the maximum size in all data.
 
+### "clear"
+
 #### custom compare function
 
 You can pass arbitrary compare function between entries.  

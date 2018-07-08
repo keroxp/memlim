@@ -1,11 +1,11 @@
 type MemlimCacheType = string | ArrayBuffer;
-export type MemlimOverwriteType = "oldestAccess" | "oldest" | "minSize" | "maxSize";
+export type MemlimOverwriteType = "oldestAccess" | "oldest" | "minSize" | "maxSize" | "clear";
 type CompareFunction<T> = (a: T, b: T) => number;
 const kOverwriteCompareFuncs: {[key: string]: CompareFunction<MemlimEntry<any>>} = {
-    oldestAccess: (a, b) => b.lastAccessedAt.getTime() - a.lastAccessedAt.getTime(),
-    oldest: (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-    minSize: (a, b) => b.size - a.size,
-    maxSize: (a, b) => a.size - b.size
+    oldestAccess: (a, b) => a.lastAccessedAt.getTime() - b.lastAccessedAt.getTime(),
+    oldest: (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+    minSize: (a, b) => a.size - b.size,
+    maxSize: (a, b) => b.size - a.size
 };
 export type MemlimEntry<T extends MemlimCacheType> = {
     key: string,
@@ -14,6 +14,9 @@ export type MemlimEntry<T extends MemlimCacheType> = {
     lastAccessedAt: Date,
     createdAt: Date
 }
+
+let values = Object.values;
+
 export class Memlim<T extends MemlimCacheType> {
     private data: { [key: string]: MemlimEntry<T>} = {};
     private timers = {};
@@ -25,8 +28,9 @@ export class Memlim<T extends MemlimCacheType> {
         return this.size - this.freeSize;
     }
     get dataCount() {
-        return Object.values(this.data).length;
+        return values(this.data).length;
     }
+    private generation = 0;
     constructor(
         readonly size: number,
         readonly opts: { overwrite: MemlimOverwriteType | CompareFunction<MemlimEntry<T>> } = {
@@ -64,8 +68,9 @@ export class Memlim<T extends MemlimCacheType> {
         this._freeSize -= size - prevSize;
         this.clearTimer(key);
         if (ttlMsec > 0) {
+            const {generation} = this;
             this.timers[key] = setTimeout(() => {
-                this.delete(key);
+                this.expire(key, generation);
             }, ttlMsec)
         }
     }
@@ -88,17 +93,25 @@ export class Memlim<T extends MemlimCacheType> {
         }
     }
     clear() {
-        Object.values(this.timers).forEach(clearTimeout);
+        this.generation += 1;
         this._freeSize = this.size;
         this.timers = {};
         this.data = {}
+    }
+    private expire(key, gen) {
+        if (this.generation === gen) {
+            this.delete(key);
+        }
     }
     private ensureSize(size) {
         if (this.size < size) {
             throw new Error(`size to be ensured exceeds cache size: ${size} > ${this.size}`);
         }
         let compareFunc;
-        if (typeof this.opts.overwrite === "string") {
+        if (this.opts.overwrite === "clear") {
+            this.clear();
+            return;
+        } else if (typeof this.opts.overwrite === "string") {
             compareFunc = kOverwriteCompareFuncs[this.opts.overwrite];
         } else if (typeof this.opts.overwrite === "function") {
             compareFunc = this.opts.overwrite;
@@ -106,9 +119,9 @@ export class Memlim<T extends MemlimCacheType> {
         if (!compareFunc) {
             throw new Error(`there are no extra space for data: size=${size}`);
         }
-        const list = Object.values(this.data).sort(compareFunc);
+        const list = values(this.data).sort(compareFunc);
         while (list.length > 0 && this.freeSize < size) {
-            const { key } = list.pop();
+            const { key } = list.shift();
             this.delete(key);
         }
     }

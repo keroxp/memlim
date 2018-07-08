@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var kOverwriteCompareFuncs = {
-    oldestAccess: function (a, b) { return b.lastAccessedAt.getTime() - a.lastAccessedAt.getTime(); },
-    oldest: function (a, b) { return b.createdAt.getTime() - a.createdAt.getTime(); },
-    minSize: function (a, b) { return b.size - a.size; },
-    maxSize: function (a, b) { return a.size - b.size; }
+    oldestAccess: function (a, b) { return a.lastAccessedAt.getTime() - b.lastAccessedAt.getTime(); },
+    oldest: function (a, b) { return a.createdAt.getTime() - b.createdAt.getTime(); },
+    minSize: function (a, b) { return a.size - b.size; },
+    maxSize: function (a, b) { return b.size - a.size; }
 };
+var values = Object.values;
 var Memlim = /** @class */ (function () {
     function Memlim(size, opts) {
         if (opts === void 0) { opts = {
@@ -15,6 +16,7 @@ var Memlim = /** @class */ (function () {
         this.opts = opts;
         this.data = {};
         this.timers = {};
+        this.generation = 0;
         this._freeSize = size;
     }
     Object.defineProperty(Memlim.prototype, "freeSize", {
@@ -33,7 +35,7 @@ var Memlim = /** @class */ (function () {
     });
     Object.defineProperty(Memlim.prototype, "dataCount", {
         get: function () {
-            return Object.values(this.data).length;
+            return values(this.data).length;
         },
         enumerable: true,
         configurable: true
@@ -72,8 +74,9 @@ var Memlim = /** @class */ (function () {
         this._freeSize -= size - prevSize;
         this.clearTimer(key);
         if (ttlMsec > 0) {
+            var generation_1 = this.generation;
             this.timers[key] = setTimeout(function () {
-                _this.delete(key);
+                _this.expire(key, generation_1);
             }, ttlMsec);
         }
     };
@@ -98,17 +101,26 @@ var Memlim = /** @class */ (function () {
         }
     };
     Memlim.prototype.clear = function () {
-        Object.values(this.timers).forEach(clearTimeout);
+        this.generation += 1;
         this._freeSize = this.size;
         this.timers = {};
         this.data = {};
+    };
+    Memlim.prototype.expire = function (key, gen) {
+        if (this.generation === gen) {
+            this.delete(key);
+        }
     };
     Memlim.prototype.ensureSize = function (size) {
         if (this.size < size) {
             throw new Error("size to be ensured exceeds cache size: " + size + " > " + this.size);
         }
         var compareFunc;
-        if (typeof this.opts.overwrite === "string") {
+        if (this.opts.overwrite === "clear") {
+            this.clear();
+            return;
+        }
+        else if (typeof this.opts.overwrite === "string") {
             compareFunc = kOverwriteCompareFuncs[this.opts.overwrite];
         }
         else if (typeof this.opts.overwrite === "function") {
@@ -117,9 +129,9 @@ var Memlim = /** @class */ (function () {
         if (!compareFunc) {
             throw new Error("there are no extra space for data: size=" + size);
         }
-        var list = Object.values(this.data).sort(compareFunc);
+        var list = values(this.data).sort(compareFunc);
         while (list.length > 0 && this.freeSize < size) {
-            var key = list.pop().key;
+            var key = list.shift().key;
             this.delete(key);
         }
     };
