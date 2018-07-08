@@ -3,6 +3,10 @@ import * as sinon from "sinon"
 
 describe("memlim", () => {
     describe("basic", () => {
+        test(`access() should return undefined if key doesn't exist`, () => {
+            const memlim = new Memlim(10);
+            expect(memlim.access("a")).toBeUndefined();
+        });
         test("put() should store data and decrease freeSize", () => {
             const memlim = new Memlim(10);
             expect(memlim.size).toBe(10);
@@ -19,27 +23,22 @@ describe("memlim", () => {
             expect(memlim.freeSize).toBe(8)
         });
         test("delete() should return undefined if data doesn't exist", () => {
-           const memlim = new Memlim(10);
-           expect(memlim.delete("a")).toBeUndefined();
-        });
-        test("put() should throw if data is bigger than freeSize and not set overwrite option", () => {
-            const memlim = new Memlim(10, {overwrite: undefined});
-            memlim.put("a", "aaaaa");
-            expect(() => memlim.put("b", "bbbbb")).toThrow();
+            const memlim = new Memlim(10);
+            expect(memlim.delete("a")).toBeUndefined();
         });
         test("put() should throw if data which has bigger size than total size", () => {
-           const memlim = new Memlim(10);
-           expect(() => memlim.put("a", "aaaaaa")).toThrow();
+            const memlim = new Memlim(10);
+            expect(() => memlim.put("a", "aaaaaa")).toThrow();
         });
         test("clear() should clear all data", () => {
-           const memlim = new Memlim(12);
-           memlim.put("a", "aa");
-           memlim.put("b", "bb");
-           memlim.put("c", "cc");
-           expect(memlim.dataCount).toBe(3);
-           memlim.clear();
-           expect(memlim.dataCount).toBe(0);
-           expect(memlim.freeSize).toBe(12);
+            const memlim = new Memlim(12);
+            memlim.put("a", "aa");
+            memlim.put("b", "bb");
+            memlim.put("c", "cc");
+            expect(memlim.dataCount).toBe(3);
+            memlim.clear();
+            expect(memlim.dataCount).toBe(0);
+            expect(memlim.freeSize).toBe(12);
         });
         describe("put() should throw ", () => {
             ["[]", "{}", "new Date", "null", "undefined", "0", "new Uint16Array(10)"].forEach(i => {
@@ -50,24 +49,38 @@ describe("memlim", () => {
             });
         });
         test("put() should delete arbitrary data if custom compare function given to overwrite option", () => {
-            const memlim = new Memlim<string>(6, {overwrite: (a,b) => a.data.localeCompare(b.data)});
+            const memlim = new Memlim<string>(6, {overwrite: (a) => -a.key.length});
             memlim.put("a", "1");
-            memlim.put("b", "0");
-            memlim.put("c", "2");
-            memlim.put("d", "33");
+            memlim.put("bbbb", "1");
+            memlim.put("ccc", "1");
+            memlim.put("dd", "11");
             expect(memlim.dataCount).toBe(2);
             expect(memlim.freeSize).toBe(0);
-            expect(memlim.get("a")).toBeUndefined();
-            expect(memlim.get("c")).toBeUndefined();
+            expect(memlim.get("bbbb")).toBeUndefined();
+            expect(memlim.get("ccc")).toBeUndefined();
         });
+        test("put() should clear all data if overwrite: 'clear' and size to be added is bigger than freeSize", () => {
+            const memlim = new Memlim(10, {overwrite: "clear"});
+            memlim.put("a", "aaa");
+            memlim.put("b", "bb");
+            memlim.put("c", "cc");
+            expect(memlim.dataCount).toBe(1);
+            expect(memlim.freeSize).toBe(6);
+            expect(memlim.get("c")).toBe("cc");
+        })
+        test("put should throw if overwrite is not defined and size to be added is bigger than freeSize", () => {
+            const memlim = new Memlim(10, {overwrite: undefined});
+            memlim.put("a", "aaaaa");
+            expect(() => memlim.put("b", "bbbb")).toThrow();
+        })
     });
     describe("array buffer", () => {
-        test("put()", () =>{
-           const memlim = new Memlim(10);
-           const buf = new ArrayBuffer(9);
-           memlim.put("a", buf);
-           expect(memlim.freeSize).toBe(1);
-           expect(memlim.dataCount).toBe(1);
+        test("put()", () => {
+            const memlim = new Memlim(10);
+            const buf = new ArrayBuffer(9);
+            memlim.put("a", buf);
+            expect(memlim.freeSize).toBe(1);
+            expect(memlim.dataCount).toBe(1);
         });
     });
     describe("overwrite options", () => {
@@ -81,8 +94,9 @@ describe("memlim", () => {
             fakeTimer.tick(1000);
             memlim.put("b", "bb");
             fakeTimer.tick(1000);
-            memlim.get("a");
+            memlim.access("a");
             fakeTimer.tick(1000);
+            console.log(memlim["data"]["a"], memlim["data"]["b"]);
             memlim.put("c", "cc");
             expect(memlim.dataCount).toBe(2);
             expect(memlim.usedSize).toBe(8);
@@ -159,7 +173,7 @@ describe("memlim", () => {
             memlim.put("b", "bb", 200);
             memlim.clear();
             fakeTimer.tick(200);
-            memlim.put("a", "aa",  100);
+            memlim.put("a", "aa", 100);
             memlim.put("b", "bb", 200);
             expect(memlim.get("a")).toBe("aa");
             expect(memlim.get("b")).toBe("bb");
