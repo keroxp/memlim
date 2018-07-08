@@ -1,8 +1,15 @@
 {
   "name": "memlim",
-  "version": "0.0.1",
-  "description": "",
+  "version": "1.0.0-alpha",
+  "description": "Size limited in-memory cache for Node.js, Browser with no dependencies.",
   "main": "dist/index.js",
+  "keywords": [
+    "cache",
+    "memory",
+    "simple"
+  ],
+  "repository": "https://github.com/keroxp/memlim",
+  "bugs": "https://github.com/keroxp/memlim/issues",
   "scripts": {
     "test": "jest --detectOpenHandles --forceExit"
   },

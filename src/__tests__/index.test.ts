@@ -75,8 +75,8 @@ describe("memlim", () => {
         beforeEach(() => {
             fakeTimer = sinon.useFakeTimers();
         });
-        test('"eldestAccess" should delete entry which has the eldest access date', () => {
-            const memlim = new Memlim(10, {overwrite: "eldestAccess"});
+        test('"oldestAccess" should delete entry which has the oldest access date', () => {
+            const memlim = new Memlim(10, {overwrite: "oldestAccess"});
             memlim.put("a", "aa");
             fakeTimer.tick(1000);
             memlim.put("b", "bb");
@@ -89,8 +89,8 @@ describe("memlim", () => {
             expect(memlim.freeSize).toBe(2);
             expect(memlim.get("b")).toBeUndefined();
         });
-        test('"eldest" should delete entry which was created at the eldest date', () => {
-            const memlim = new Memlim(10, {overwrite: "eldest"});
+        test('"oldest" should delete entry which was created at the oldest date', () => {
+            const memlim = new Memlim(10, {overwrite: "oldest"});
             memlim.put("a", "aa");
             fakeTimer.tick(1000);
             memlim.put("b", "bb");

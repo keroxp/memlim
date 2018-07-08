@@ -1,9 +1,9 @@
 type MemlimCacheType = string | ArrayBuffer;
-export type MemlimOverwriteType = "eldestAccess" | "eldest" | "minSize" | "maxSize";
+export type MemlimOverwriteType = "oldestAccess" | "oldest" | "minSize" | "maxSize";
 type CompareFunction<T> = (a: T, b: T) => number;
 const kOverwriteCompareFuncs: {[key: string]: CompareFunction<MemlimEntry<any>>} = {
-    eldestAccess: (a, b) => b.lastAccessedAt.getTime() - a.lastAccessedAt.getTime(),
-    eldest: (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    oldestAccess: (a, b) => b.lastAccessedAt.getTime() - a.lastAccessedAt.getTime(),
+    oldest: (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
     minSize: (a, b) => b.size - a.size,
     maxSize: (a, b) => a.size - b.size
 };
@@ -30,7 +30,7 @@ export class Memlim<T extends MemlimCacheType> {
     constructor(
         readonly size: number,
         readonly opts: { overwrite: MemlimOverwriteType | CompareFunction<MemlimEntry<T>> } = {
-            overwrite: "eldestAccess"
+            overwrite: "oldestAccess"
         }) {
         this._freeSize = size;
     }

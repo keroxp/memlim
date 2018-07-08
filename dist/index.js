@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var kOverwriteCompareFuncs = {
-    eldestAccess: function (a, b) { return b.lastAccessedAt.getTime() - a.lastAccessedAt.getTime(); },
-    eldest: function (a, b) { return b.createdAt.getTime() - a.createdAt.getTime(); },
+    oldestAccess: function (a, b) { return b.lastAccessedAt.getTime() - a.lastAccessedAt.getTime(); },
+    oldest: function (a, b) { return b.createdAt.getTime() - a.createdAt.getTime(); },
     minSize: function (a, b) { return b.size - a.size; },
     maxSize: function (a, b) { return a.size - b.size; }
 };
 var Memlim = /** @class */ (function () {
     function Memlim(size, opts) {
         if (opts === void 0) { opts = {
-            overwrite: "eldestAccess"
+            overwrite: "oldestAccess"
         }; }
         this.size = size;
         this.opts = opts;
