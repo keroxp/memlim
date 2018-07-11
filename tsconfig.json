@@ -9,6 +9,7 @@
       "scripthost",
       "es2017.object"
     ],
+    "declaration": true,
     "outDir": "dist"
   },
   "include": [
