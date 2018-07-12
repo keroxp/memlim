@@ -1,5 +1,5 @@
 # memlim
-![npm](https://img.shields.io/npm/v/memlim.svg?style=flat-square)
+[![npm](https://img.shields.io/npm/v/memlim.svg?style=flat-square)](https://www.npmjs.com/package/memlim)
 ![CircleCI](https://img.shields.io/circleci/project/github/keroxp/memlim.svg?style=flat-square)
 ![Codecov](https://img.shields.io/codecov/c/github/keroxp/memlim.svg?style=flat-square)
 
@@ -17,7 +17,7 @@ $ npm install memlim
 
 import {Memlim} from "memlim"
 
-const memlim = new Memlim(1024 * 1000 * 1000 * 10); // 10MB cache at the most
+const memlim = new Memlim(1024 * 1024 * 10); // 10MB cache at the most
 
 memlim.put("a", "aaa"); // put cache with no ttl
 memlim.put("b", "bbb", 1000); // with ttl (msec)
