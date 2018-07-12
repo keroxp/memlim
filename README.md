@@ -67,16 +67,16 @@ Try to delete entries that has the maximum size in all data.
 #### custom compare function
 
 You can pass arbitrary compare function between entries.  
-When compare function was given, memlim will sort entries by that and delete the last entry recursively until total free size exceeds size to be added.
+When compare function was given, memlim will sort entries by that and delete the first entry recursively until total free size exceeds size to be added.
 
 ```js
 const memlim = new Memlim(12, {
-    overwrite: (a, b) => a.data.localCompare(b.data)
+    overwrite: (a, b) => a.data.localeCompare(b.data)
 });
 memlim.put("a", "11");
 memlim.put("b", "22");
 memlim.put("c", "01");
-// will delete b("22")
+// will delete c("01")
 memlim.put("d", "33");
 
 ```
