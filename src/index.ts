@@ -32,10 +32,13 @@ export class Memlim<T extends MemlimCacheType> {
     }
     private generation = 0;
     constructor(
-        readonly size: number,
+        readonly size: number = 10000000,
         readonly opts: { overwrite: MemlimOverwriteType | CompareFunction<MemlimEntry<T>> } = {
             overwrite: "oldestAccess"
         }) {
+            if (typeof size !== "number" || size !== size || size <= 0) {
+                throw new Error(`invalid type for "size": ${size}`)
+            }
         this._freeSize = size;
     }
     put(key: string, data: T, ttlMsec: number = -1) {

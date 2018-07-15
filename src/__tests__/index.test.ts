@@ -3,6 +3,17 @@ import * as sinon from "sinon"
 
 describe("memlim", () => {
     describe("basic", () => {
+        describe("constructor", () => {
+            test("should set 10MB for size if size was not given", () => {
+                const memlim =  new Memlim;
+                expect(memlim.size).toBe(1000*1000*10);
+            })
+            test("should throw Error if size is not number", () => {
+                expect(() => new Memlim(null)).toThrow();
+                expect(() => new Memlim(NaN)).toThrow();
+                expect(() => new Memlim(-100));
+            });
+        });
         test("put() should store data and decrease freeSize", () => {
             const memlim = new Memlim(10);
             expect(memlim.size).toBe(10);

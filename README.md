@@ -17,7 +17,7 @@ $ npm install memlim
 
 import {Memlim} from "memlim"
 
-const memlim = new Memlim(1024 * 1024 * 10); // 10MB cache at the most
+const memlim = new Memlim(1000 * 1000 * 10); // 10MB cache at the most
 
 memlim.put("a", "aaa"); // put cache with no ttl
 memlim.put("b", "bbb", 1000); // with ttl (msec)
